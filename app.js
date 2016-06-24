@@ -4,6 +4,7 @@
 
 import Koa from 'koa'
 import Router from 'koa-router'
+import session from 'koa-session-redis'
 import mongo from 'koa-mongo'
 import convert from 'koa-convert'
 import serve from 'koa-static'
@@ -42,15 +43,16 @@ app.use(async (ctx,next)=>{
             ctx.body="500"
     }
 })
-/*
+
 app.use(convert(mongo({
     host:process.env['MONGO_HOST']||'localhost',
     port:process.env['MONGO_PORT']||27017,
     //user:process.env['MONGO_USER']||"root",
     //pass:process.env['MONGO_PWD']||"",
-    db:"sbt_smth"
+    db:"uno_room"
 })))
-*/
+
+app.use(convert(session({store:{host:process.env.REDIS_HOST,port:process.env.REDIS_PORT,ttl:3600*6,auth:process.env.REDIS_AUTH}})))
 app.use(convert(serve(__dirname + '/dynamic')))
 app.use(convert(serve(__dirname)))
 app.use(router.routes())

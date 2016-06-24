@@ -1,0 +1,69 @@
+extends frag/framework
+
+block style
+    style
+        :stylus
+            html,body,main,.hall
+                height 100%
+            .yahei
+                font-family "Microsoft YaHei"!important
+            .slider.fullscreen
+                z-index -1
+                position fixed
+            .hall.row
+                padding 4rem 0
+                margin 0
+                .col
+                    height 100%
+                    .rooms
+                        height 100%
+                        min-height 380px
+                    .user
+                        min-height 16rem
+                        .progress
+                            margin-top 2rem
+                            height 1rem
+                .max-btn
+                    width 100%
+                    margin 0.5rem 0
+
+
+block content
+    main
+        div.row.hall.yahei
+            div.col.l5.offset-l2.m7.offset-m1.s8
+                div.card-panel.white.rooms
+                    h4 等我睡醒再写_(:зゝ∠)_
+
+            div.col.l3.m3.s4
+                div.card-panel.white.user
+                    div.row
+                        div.col.s12
+                            div.row
+                                div.col.s6
+                                    img.circle.responsive-img(src="/static/img/default_face.jpg")
+                                div.col.s6
+                                    p.black-text.bold 逗逗逗比逗
+                                    p.blue-text Lv0
+                        div.col.s6
+                            span 总局数&nbsp;&nbsp;&nbsp;
+                            span.bold.blue-text 300
+                        div.col.s6
+                            span 胜利&nbsp;&nbsp;&nbsp;
+                            span.bold.blue-text 180
+                        div.col.s12
+                            div.progress
+                                div.determinate(style="width:60%")
+                a.waves-effect.waves-light.white-text.btn.max-btn.yahei 快速加入
+                a.waves-effect.waves-light.white-text.btn.max-btn.yahei 创建房间
+                a.waves-effect.waves-light.white-text.btn.max-btn.yahei 不玩啦~
+        div.slider.fullscreen
+            ul.slides
+                each s in slides
+                    li
+                        img(src=s.img)
+
+    script.
+        (function () {
+            $('.slider').slider({full_width: true,interval:3000,indicators:false})
+        })()

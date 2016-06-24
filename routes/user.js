@@ -16,8 +16,10 @@ router.post('/signup',async (ctx,next)=>{
         var res2=await request({uri:proxyHost+"/user/oauth?uin="+res.body.uin+"&token=000002"+res.body.token.substring(6,24),
             method:"POST"})
         res2.body=JSON.parse(res2.body)
-        if(res2.body.result==200)
+        if(res2.body.result==200){
             ctx.body=res.body
+            ctx.session.token=res.body.token.substring(6,24)
+        }
     }else
         ctx.body=res
     await next()
@@ -37,21 +39,49 @@ router.get('/login',async (ctx,next)=>{
     })
     await next()
 }).post('/login',async (ctx,next)=>{
-    var res=await request({uri:proxyHost+ctx.path+"?project=000002",
+    var res=await request({uri:proxyHost+ctx.path+"?token=000002000000000000000000000000",
         method:"POST",body:JSON.stringify(await parse.json(ctx))})
+    ctx.body=res.body
+    ctx.session.token=res.body.token.substring(6,24)
+    await next();
+})
+
+router.get('/',async (ctx,next)=>{
+    if(!ctx.session.token)
+        return ctx.render('redirectLogin')
+    var res=await request({uri:proxyHost+ctx.path+"?token=000002"+ctx.session.token,method:'GET'})
     ctx.body=res.body
     await next();
 })
 
-router.get('/',async ctx=>{
-    var res=await request({uri:proxyHost+ctx.path+"?"+ctx.querystring,method:'GET'})
-    ctx.body=res.body
-})
-
-router.put('/',async ctx=>{
-    var res=await request({uri:proxyHost+ctx.path+"?"+ctx.querystring,
+router.put('/',async (ctx,next)=>{
+    if(!ctx.session.token)
+        return ctx.render('redirectLogin')
+    var res=await request({uri:proxyHost+ctx.path+"?token=000002"+ctx.session.token,
         method:'PUT',body:JSON.stringify(await parse.json(ctx))})
     ctx.body=res.body
+    await next();
+})
+
+router.del('/',async (ctx,next)=>{
+    ctx.session=null
+    ctx.body={result:200}
+    await next();
+})
+
+router.get('/test',async (ctx,next)=>{
+    ctx.render('hall',{
+        without_footer:1,
+        title:"BBB - uno大厅",
+        default_face:"/static/img/default_face.jpg",
+        title_img:"/static/img/login_title_img.jpg",
+        slides:[
+            {img:"/static/img/bg1.jpg"},
+            {img:"/static/img/bg2.jpg"},
+            {img:"/static/img/bg3.jpg"}
+        ]
+    })
+    await next();
 })
 
 export {router}

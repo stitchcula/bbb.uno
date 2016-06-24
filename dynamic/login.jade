@@ -197,7 +197,7 @@ block content
             $("#onLogin").click(function () {
                 var postObj={pass : hex_sha1($("#pwd").val())}
                 var usr = $("#usr").val()
-                if (!usr || !postObj.pwd)
+                if (!usr || !postObj.pass)
                     return Materialize.toast('请填写完整信息~', 4000)
                 if (/^[0-9]{11}$/.test(usr))
                     postObj.tel=usr
@@ -207,7 +207,7 @@ block content
                     return Materialize.toast('请填写正确信息~', 4000)
 
                 $("#onLogining").addClass("active")
-                ajax("/user/login?rd=" + Math.random().toString(36).substr(2), 'POST', postObj
+                ajax("/user/login?rd=" + Math.random().toString(36).substr(2), 'POST', JSON.stringify(postObj)
                 , function (err, res) {
                     $("#onLogining").removeClass("active")
                     if (err) console.log(err)
@@ -270,13 +270,13 @@ block content
                     })
                 var postObj = { account : $("#i2").val(),pass: hex_sha1($("#i3").val())}
                 var usr = $("#i1").val()
-                if (!usr || !postObj.pwd||!postObj.account)
+                if (!usr || !postObj.pass||!postObj.account)
                     return Materialize.toast('请填写完整信息~', 4000)
                 if (/^[0-9]{11}$/.test(usr))
                     postObj.tel = usr
                 else if (/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.test(usr))
                     postObj.email = usr
-                ajax('/user/signup?rd=' + Math.random().toString(36).substr(2), 'POST', postObj, function (err, res) {
+                ajax('/user/signup?rd=' + Math.random().toString(36).substr(2), 'POST',JSON.stringify(postObj), function (err, res) {
                     $("#onSigning").removeClass("active")
                     if (err) console.log(err)
                     res = JSON.parse(res)
@@ -298,7 +298,7 @@ block content
         function ajax(path, method, data, callback) {
             if (!callback) callback = data
             $.ajax({
-                url: path, type: method, cache: false, data: data,
+                url: path, type: method, cache: false, data: data,contentType:"application/json;charset=utf-8",
                 beforeSend: function () {
                     jQuery("footer>.ajaxLoad").fadeIn(200)
                 },

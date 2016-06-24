@@ -195,7 +195,8 @@ block content
             $('#toSign').click(function(){$("html,body").animate({scrollTop:0},600)})
 
             $("#onLogin").click(function () {
-                var postObj={pass : hex_sha1($("#pwd").val())}
+                //var postObj={pass : hex_sha1($("#pwd").val())}
+                var postObj={pass : $("#pwd").val()}
                 var usr = $("#usr").val()
                 if (!usr || !postObj.pass)
                     return Materialize.toast('请填写完整信息~', 4000)
@@ -268,7 +269,8 @@ block content
                         allowOutsideClick: true,
                         timer: 820
                     })
-                var postObj = { account : $("#i2").val(),pass: hex_sha1($("#i3").val())}
+                //var postObj = { account : $("#i2").val(),pass: hex_sha1($("#i3").val())}
+                var postObj = { account : $("#i2").val(),pass: $("#i3").val()}
                 var usr = $("#i1").val()
                 if (!usr || !postObj.pass||!postObj.account)
                     return Materialize.toast('请填写完整信息~', 4000)

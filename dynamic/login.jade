@@ -137,15 +137,15 @@ block content
                                     label.yahei(for="i1") 手机号/邮箱
                                 div.input-field.col.s12
                                     input#i2.validate.yahei(type="text",placeholder="")
-                                    label.yahei(for="i1") 昵称
+                                    label.yahei(for="i2") 昵称
                                 div.input-field.col.s12
                                     input#i3.validate.yahei(type="password",placeholder="")
-                                    label.yahei(for="i1",data-error="") 密码
+                                    label.yahei(for="i3",data-error="") 密码
                                 div.input-field.col.s12.yzm
                                     div.row
                                         div.col.s6.m8.no-padding
                                             input#i4.validate.yahei(type="text",placeholder="")
-                                            label.yahei(for="i1",data-error="") 验证码
+                                            label.yahei(for="i4",data-error="") 验证码
                                         div.col.s6.m4
                                             a#onVfc.waves-effect.waves-light.white-text.btn.right.yahei.action 点击获取
                                 div.col.s12
@@ -153,12 +153,28 @@ block content
                                         input#ifAgree(type="checkbox")
                                         label.yahei(for="ifAgree") 已阅读并同意
                                         a.teal-text.text-lighten-4.bold.modal-trigger.yahei(href="#usrAgreement") 《服务协议》
+                                    div#onSigning.preloader-wrapper.small
+                                        div.spinner-layer.spinner-red-only
+                                            div.circle-clipper.left
+                                                div.circle
+                                            div.gap-patch
+                                                div.circle
+                                            div.circle-clipper.right
+                                                div.circle
                                     a#onSign.waves-effect.waves-light.white-text.btn.right.yahei.action 注册
                         div.card-action
                             a.btn-flat.waves-light
                                 i.icon-qq.left
                                 | QQ
                             a#onLogin.waves-effect.waves-light.white-text.btn.right.yahei.action 登陆
+                            div#onLogining.preloader-wrapper.small.right
+                                div.spinner-layer.spinner-red-only
+                                    div.circle-clipper.left
+                                        div.circle
+                                    div.gap-patch
+                                        div.circle
+                                    div.circle-clipper.right
+                                        div.circle
         //usrAgreement
         div#usrAgreement.modal.modal-fixed-footer
             div.modal-content
@@ -178,4 +194,121 @@ block content
             $('.slider').slider({full_width: true,interval:3000,indicators:false})
             $('#toSign').click(function(){$("html,body").animate({scrollTop:0},600)})
 
+            $("#onLogin").click(function () {
+                var postObj={pass : hex_sha1($("#pwd").val())}
+                var usr = $("#usr").val()
+                if (!usr || !postObj.pwd)
+                    return Materialize.toast('请填写完整信息~', 4000)
+                if (/^[0-9]{11}$/.test(usr))
+                    postObj.tel=usr
+                else if(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.test(usr))
+                    postObj.email=usr
+                else
+                    return Materialize.toast('请填写正确信息~', 4000)
+
+                $("#onLogining").addClass("active")
+                ajax("/user/login?rd=" + Math.random().toString(36).substr(2), 'POST', postObj
+                , function (err, res) {
+                    $("#onLogining").removeClass("active")
+                    if (err) console.log(err)
+                    res = JSON.parse(res)
+                    if (res.result == 200) {
+                        //return window.location = "/"
+                        /*?rd="+Math.random().toString(36).substr(2)*/
+                    }else {
+                        return swal({
+                            title: "账户或密码错误~",
+                            type: 'error',
+                            showConfirmButton: false,
+                            allowOutsideClick: true,
+                            timer: 820
+                        })
+                    }
+                })
+            })
+            /*
+            $("#i3").blur(function () {
+                if ($("#i3").val() != $("#i4").val()) {
+                    $("#i4").toggleClass("invalid", true)
+                } else {
+                    $("#i4").toggleClass("invalid", false)
+                }
+            })
+
+            $("#i4").blur(function () {
+                if ($("#i3").val() != $("#i4").val()) {
+                    $("#i4").toggleClass("invalid", true)
+                } else {
+                    $("#i4").toggleClass("invalid", false)
+                }
+            })
+            */
+            $("#onSign").click(function () {
+                if (!$("#i1").val()||!$("#i2").val() || !$("#i3").val() || !$("#i4").val())
+                    return Materialize.toast('请填写完整信息~', 4000)
+                /*
+                if ($("#i3").val() != $("#i4").val())
+                    return Materialize.toast('两次输入密码不匹配。', 4000)
+                */
+                $("#onForgeting").addClass("active")
+                var ifMsg = $("#ifAgree").prop('checked')
+                if(!ifMsg)
+                     return swal({
+                         title: "不同意还玩个j8啊。",
+                         type: 'error',
+                         showConfirmButton: false,
+                         allowOutsideClick: true,
+                         timer: 820
+                     })
+                if ( $("#i4").val() != "1027")
+                    return swal({
+                        title: "验证码是1027。_(:зゝ∠)_",
+                        type: 'error',
+                        showConfirmButton: false,
+                        allowOutsideClick: true,
+                        timer: 820
+                    })
+                var postObj = { account : $("#i2").val(),pass: hex_sha1($("#i3").val())}
+                var usr = $("#i1").val()
+                if (!usr || !postObj.pwd||!postObj.account)
+                    return Materialize.toast('请填写完整信息~', 4000)
+                if (/^[0-9]{11}$/.test(usr))
+                    postObj.tel = usr
+                else if (/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.test(usr))
+                    postObj.email = usr
+                ajax('/user/signup?rd=' + Math.random().toString(36).substr(2), 'POST', postObj, function (err, res) {
+                    $("#onSigning").removeClass("active")
+                    if (err) console.log(err)
+                    res = JSON.parse(res)
+                    if (res.result == 200) {
+                        //return window.location = "/"
+                    } else {
+                        return swal({
+                            title: "我也不知道为什么出错了oAo",
+                            type: 'error',
+                            showConfirmButton: false,
+                            allowOutsideClick: true,
+                            timer: 820
+                        })
+                    }
+                })
+            })
         })()
+
+        function ajax(path, method, data, callback) {
+            if (!callback) callback = data
+            $.ajax({
+                url: path, type: method, cache: false, data: data,
+                beforeSend: function () {
+                    jQuery("footer>.ajaxLoad").fadeIn(200)
+                },
+                complete: function (res) {
+                    jQuery("footer>.ajaxLoad").fadeOut(200)
+                    if (res.status == 0) Materialize.toast('网络故障……', 4000)
+                    if (res.status == 403) Materialize.toast('服务器残忍地拒绝了这次请求', 4000)
+                    if (res.status == 404) Materialize.toast('服务器懵逼了', 4000)
+                    if (res.status == 500) Materialize.toast('服务器傻掉了', 4000)
+                    callback(res.responseText.code, res.responseText)
+                }
+            })
+        }

@@ -9,7 +9,7 @@ const router=new Router()
 const proxyHost="http://iot.shibeta.org:806"
 
 router.post('/signup',async (ctx,next)=>{
-    var res=await request({uri:proxyHost+ctx.path+"??project=000002",
+    var res=await request({uri:proxyHost+ctx.path+"?project=000002",
         method:"POST",body:JSON.stringify(await parse.json(ctx))})
     res.body=JSON.parse(res.body)
     if(res.body.result==200){

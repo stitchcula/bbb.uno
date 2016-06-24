@@ -1,14 +1,14 @@
 {
-  "name": "sbt_smthw",
+  "name": "bbb.uno",
   "version": "1.0.0",
   "description": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node entry.js"
   },
   "keywords": [
     "node",
-    "smart"
+    "uno"
   ],
   "author": "Stitch Cula",
   "license": "MPL-1.1",

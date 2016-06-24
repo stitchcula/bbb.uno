@@ -1,0 +1,31 @@
+extends frag/framework
+block style
+    title=title
+    style
+        :stylus
+            .apiList
+                margin-left 20px
+                h4
+                    margin-bottom 6px
+                p
+                    margin-top 0
+                    margin-bottom 0
+
+block content
+    div.apiList
+        h1 API List
+        h4 POST /api/mailer
+        p Accept "to","subject","html" and "hook" in JSON object.
+        p System will push the request to Task Queue,and finish in spare time.
+        p After sending mail,system will POST result(JSON) to your hook.
+
+        h4 GET /api/music
+        p Redirect to a random music link.
+
+        h4 GET /api/sync
+        p Test whether system is running.
+
+        h4 POST /api/sync
+        p Trigger system sync itself from github.
+
+

@@ -1,0 +1,21 @@
+extends frag/framework
+block style
+    style
+        :stylus
+            .test
+                margin 0
+block content
+    main
+        div.slider
+            ul.slides
+                -var menu=[{},{},{}]
+                each m in menu
+                    li
+                        img(src="http://lorempixel.com/580/250/nature/1")
+                        div.caption.center-align
+                            h3 This is our big Tagline!
+                            h5.light.grey-text.text-lighten-3 Here's our small slogan.
+    script.
+        $(function(){
+            $('.slider').slider({full_width: true,interval:3000})
+        })

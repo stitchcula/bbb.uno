@@ -1,0 +1,185 @@
+nav.top-nav
+    div.container
+        div.nav-wrapper
+            a.brand-logo
+                i.material-icons.left find_in_page
+                |真伪查询
+div.container.cms_auth
+    div.row.cms_auth_input
+        div.col.s10.offset-s1.m8.offset-m2.l6.offset-l3
+            blockquote.yahei.grey-text 输入HS为开头的14位合同编码以查询真伪。
+            div.card
+                input(value="HS").yahei
+                i.material-icons search
+    -var now=new Date().getFullYear()+"年 "+(new Date().getMonth()+1)+"月 "+new Date().getDate()+"日"
+    div.row.ct_inner
+        div.col.s10.offset-s1
+            div.z-depth-1
+                i.material-icons.right close
+                div.container
+                    div.row
+                        div.input-field.col.s12.m12.l10.offset-l1.roInput
+                            input.validate.yahei(disabled,type="text",value="N/a")
+                            p.right.red-text.p_status.yahei N/a
+                        div.input-field.col.s12.m12.l5.offset-l1.roInput
+                            input.validate.yahei(disabled,type="text",value="N/a")
+                            label.active.yahei 甲方
+                        div.input-field.col.s12.m12.l5.roInput
+                            input.validate.yahei(disabled,type="text",value="N/a")
+                            label.active.yahei 甲方代表
+                        div.input-field.col.s12.m12.l5.offset-l1.roInput
+                            input.validate.yahei(disabled,value="N/a",type="text")
+                            label.active.yahei 乙方
+                        div.input-field.col.s12.m12.l5.roInput
+                            input.validate.yahei(disabled,type="text",value="N/a")
+                            label.active.yahei 乙方代表
+                        div.input-field.col.s12.m12.l5.offset-l1.roInput
+                            input.datepicker.yahei(disabled,type="date",value=now)
+                            label.active.yahei 签订时间
+                        div.input-field.col.s12.m12.l5.roInput
+                            input.validate.yahei(disabled,type="text",value="N/a")
+                            label.active.yahei 签订地点
+                        div.input-field.col.s6.m6.l5.offset-l1.roInput
+                            input.datepicker.yahei(disabled,type="date",placeholder="起始日期",value=now)
+                            label.active.yahei 有效期限
+                        div.input-field.col.s6.m6.l5.roInput
+                            input.datepicker.yahei(disabled,type="date",placeholder="终止日期",value=now)
+                            label.active.yahei 到
+                        div.input-field.col.s10.m11.l5.offset-l1.roInput
+                            input.validate.yahei(disabled,type="number",placeholder="人民币",value=0)
+                            label.active.yahei 合同金额
+                        div.input-field.col.s2.m1.l1
+                            p.yahei 元
+    div.row.ct_inner_404
+        div.col.s10.offset-s1
+            div.z-depth-1
+                i.material-icons.right close
+                div.container
+                    div.row
+                        div.col.s12.m12.l10.offset-l1
+                            p.red-text.yahei 没有查询到该合同编码的记录，这是一个不被 浩盛消防 承认的合同编码。
+                            p.yahei.grey-text · 请检查输入。
+                            p.yahei.grey-text · 可能尚未授权，请耐心等待。
+
+    style
+        :stylus
+            .cms_auth
+                .yahei
+                    font-family "Microsoft YaHei"!important
+                .cms_auth_input
+                    margin-top 24%
+                    .card
+                        input
+                            display block
+                            font-size 16px
+                            font-weight 300
+                            width 100%
+                            height 45px
+                            margin 0
+                            padding 0 45px 0 15px
+                            border 0
+                            outline none
+                            box-shadow: none
+                            -webkit-transition: all 0.3s
+                            -moz-transition: all 0.3s
+                            -ms-transition: all 0.3s
+                            -o-transition: all 0.3s
+                            transition: all 0.3s
+                        i
+                            position: absolute
+                            top: 10px
+                            right: 10px
+                            cursor: pointer;
+                .ct_inner,.ct_inner_404
+                    display: none
+                    margin-bottom 0!important
+                    .row
+                        margin-bottom 0!important
+                    input
+                        border-bottom 1px solid #9E9E9E!important
+                        box-shadow 0 0 0 0 #9e9e9e!important
+                    .input-field:first-of-type
+                        input
+                            text-align center
+                    .p_status
+                        margin 0
+                    .roInput
+                        input
+                            color #222222!important
+                        label
+                            color #9e9e9e!important
+                    .col:first-of-type
+                        margin-top 0!important
+                    .col:last-of-type
+                        margin-bottom 1rem!important
+                    i
+                        cursor: pointer
+                        margin-top 2px
+                        margin-left 2px
+
+    script.
+        (function(){
+            $('.datepicker').pickadate({
+                selectMonths: true,
+                selectYears: 10
+            })
+
+            $(".cms_auth_input i").click(function(){
+                var i=$(".cms_auth_input input").val().toUpperCase()
+
+                var iReg = /^[A-Z0-9]{14}$/
+                if(!iReg.test(i)) return Materialize.toast('请输入格式正确的合同编码。', 4000)
+
+                ajax('/vfc','POST',{id:(i?i:"HS160325D95908")},function(err,res){
+                    if(err) console.log(err)
+                    res=JSON.parse(res)
+                    if(res.result==200){
+                        $(".cms_auth_input").animate({marginTop:"0"},350,function(){
+                            $('.ct_inner_clone').remove()
+                            for(var n=0;n<res.cts.length;n++){
+                                for(var m=0;m<$(".ct_inner").eq(0).find("input").length;m++){
+                                    document.querySelectorAll(".ct_inner")[0].querySelectorAll("input")[m].value=res.cts[n][m]
+                                }
+                                $(".ct_inner").eq(0).find(".p_status").text(res.cts[n][10])
+                                $('.cms_auth').append( $('.ct_inner').eq(0).clone(true))
+                                $('.ct_inner').eq(n+1).addClass('ct_inner_clone').fadeIn(100)
+                            }
+                        })
+                    }
+                    if(res.result==404){
+                        $(".cms_auth_input").animate({marginTop:"0"},350,function(){
+                            $('.ct_inner_clone').remove()
+                            $('.cms_auth').append( $('.ct_inner_404').eq(0).clone(true))
+                            $('.ct_inner_404').eq(1).addClass('ct_inner_clone').fadeIn(100)
+                        })
+                    }
+                })
+            })
+
+            $(".ct_inner i").click(function(){
+                $(this).closest(".ct_inner_clone").remove()
+                $(".cms_auth_input").animate({marginTop:"24%"},350)
+            })
+
+            $(".ct_inner_404 i").click(function(){
+                $(this).closest(".ct_inner_clone").remove()
+                $(".cms_auth_input").animate({marginTop:"24%"},350)
+            })
+
+            function ajax(path,method,data,callback){
+                if(!callback) callback=data
+                $.ajax({url:path,type:method,cache:false,data:data,
+                    beforeSend:function(){
+                        jQuery("footer>.ajaxLoad").fadeIn(200)
+                    },
+                    complete:function(res){
+                        jQuery("footer>.ajaxLoad").fadeOut(200)
+                        if(res.status==0) Materialize.toast('网络故障……', 4000)
+                        if(res.status==403) Materialize.toast('服务器残忍地拒绝了这次请求', 4000)
+                        if(res.status==404) Materialize.toast('服务器懵逼了', 4000)
+                        if(res.status==500) Materialize.toast('服务器傻掉了', 4000)
+                        callback(res.responseText.code,res.responseText)
+                    }
+                })
+            }
+        })()

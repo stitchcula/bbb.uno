@@ -1,0 +1,16 @@
+extends frag/framework
+
+block style
+    script(src='/static/lib/class.js')
+    style
+        :stylus
+            .yahei
+                font-family "Microsoft YaHei"
+    include mixin/upload
+    include mixin/upload_mini
+
+block content
+    main
+        a.waves-effect.waves-light.btn.modal-trigger.yahei(href="#upload") 上传
+        +upload
+        //+upload_mini

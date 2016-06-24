@@ -1,0 +1,42 @@
+//include fwStyleM
+style
+    :stylus
+        @import "frag/hack"
+        body
+            display: flex;min-height: 100vh;flex-direction: column;
+        main
+            flex: 1 0 auto
+        body,html
+            padding 0
+            margin 0
+            width 100%
+        nav .nav-wrapper i
+            line-height inherit
+        .bold>a
+            font-weight bold
+        .sweet-alert
+            -webkit-box-sizing: content-box!important
+            -moz-box-sizing: content-box!important
+            box-sizing: content-box!important
+            font-family "Microsoft YaHei"
+        .fw_header
+            height 160px
+            width 100%
+            background #27ff1d
+            position: relative
+            .bar
+                width 100%
+                height 48px
+                linear-gradient(top,rgba(255,255,255,1),rgba(255,255,255,0))
+                .container
+                    height 18px
+                    background #000
+            .menu
+                //linear-gradient(bottom,rgba(255,255,255,1),rgba(255,255,255,0))
+                position absolute
+                bottom 0
+                width 100%
+                height 48px
+
+
+

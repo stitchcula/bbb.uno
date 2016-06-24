@@ -1,0 +1,395 @@
+extends frag/framework
+
+block style
+    link(rel='stylesheet',href='/static/css/icomoon.css')
+    style
+        :stylus
+            .yahei
+                font-family "Microsoft YaHei"
+            .test
+                background #000000
+            footer
+                z-index 5
+            //body,html
+            //    min-width 400px
+            .slider.fullscreen
+                z-index -1
+                position fixed
+            .login
+                width 100%
+                .card
+                    .face
+                        img
+                            border 1px solid #cccccc
+                    .card-content
+                        padding-bottom 12px
+                    .card-action
+                        #onLogin
+                            margin-left 20px
+                    .card-action a.btn-flat
+                        color #65BEF3!important
+                    .card-action a.btn-flat:hover
+                        color #8ed7ff!important
+                    .card-action .action
+                        min-width 120px
+                .row
+                    margin-bottom 0
+                .collection
+                    margin-top 0
+                    margin-bottom 12px
+                    .collection-item
+                        padding 0px 10px
+                    //last input border
+                    .collection-item:last-child
+                        border-bottom 1px solid #FFFFFF
+                    .collection-item:last-child:focus
+                        border-bottom 1px solid #26a69a
+                .card-content input
+                    height 2rem
+                .card-reveal
+                    input
+                        height 2.5rem
+                        margin-bottom 12px
+                    div.action
+                        display inline
+                    >.row>.col:last-of-type
+                        padding-top 1rem
+                .btn-flat
+                    padding 0 1rem
+                    height 2rem
+                    margin-bottom 2px
+                .card-reveal .input-field:first-of-type
+                    margin-top 2rem
+                .resMsg
+                    height 14px
+                    font-size 14px
+                    color #ff755d
+                    display inline
+                .p_inline
+                    display: inline
+                    line-height inherit
+                @media only screen and (max-width: 600px)
+                    .face
+                        width 50%
+                        margin 20px auto
+                    .collection
+                        margin 20px auto
+                    .card-content input, .card-reveal input
+                        height 3rem
+                    .card-reveal
+                        .input-field
+                            height 4rem
+                            margin 5% auto
+                        div.action
+                            display block
+                        >.row>.col:last-of-type .btn.action
+                            margin 10%
+                            width 80%
+                    .btn-flat.action
+                        padding 0 1rem
+                        height 3rem
+                        margin 20px auto
+                    .btn-flat.action:last-of-type
+                        float right !important
+
+
+
+
+block content
+    main.valign-wrapper
+        div.login.valign
+            div.row
+                div.col.s12.m8.l4.offset-m2.offset-l4
+                    div.card.hoverable
+                        div.card-image
+                            img(src=title_img)
+                            span.card-title.yahei 浩盛消防 登陆
+                        div.card-content
+                            div.row
+                                div.col.s12.m3
+                                    div.face
+                                        img.circle.responsive-img(src=default_face)
+                                div.col.s12.m6
+                                    div.collection
+                                        input#usr(type="text",placeholder="用户名/邮箱/手机号").collection-item.validate
+                                        input#pwd(type="password",placeholder="密码").collection-item.validate
+                                    //p.center
+                                        input#ifRemember(type="checkbox")
+                                        label.yahei(for="ifRemember") 记住密码
+                                div.col.s12.m3
+                                    a.btn-flat.waves-effect.waves-teal.yahei.grey-text.text-lighten-1.action &nbsp;
+                                    a#toForget.btn-flat.waves-effect.waves-teal.yahei.grey-text.text-lighten-1.action.activator 忘记密码
+
+                        div.card-reveal
+                            span.card-title.grey-text.text-darken-4.yahei 重置密码
+                                i.material-icons.right close
+                            div.row
+                                //div.input-field.col.s12
+                                    input#i1.validate.yahei(type="text",placeholder="")
+                                    label.yahei(for="i1") 真实姓名
+                                div.input-field.col.s12
+                                    input#i2.validate.yahei(type="text",placeholder="")
+                                    label.yahei(for="i2") 身份证号
+                                div.input-field.col.s12
+                                    input#i3.validate.yahei(type="password",placeholder="")
+                                    label.yahei(for="i3",data-error="") 新密码
+                                div.input-field.col.s12
+                                    input#i4.validate.yahei(type="password",placeholder="")
+                                    label.yahei(for="i4",data-error="") 重复密码
+                                div.col.s12
+                                    p
+                                        input#onForgetByMobile(type="checkbox")
+                                        label(for="onForgetByMobile").yahei 通过手机验证
+                                    div#onForgeting.preloader-wrapper.small
+                                        div.spinner-layer.spinner-red-only
+                                            div.circle-clipper.left
+                                                div.circle
+                                            div.gap-patch
+                                                div.circle
+                                            div.circle-clipper.right
+                                                div.circle
+                                    a#onForget.waves-effect.waves-light.white-text.btn.right
+                                        i.material-icons done_all
+                        div.card-action
+                            a.btn-flat.waves-light
+                                i.icon-qq.left
+                                | QQ
+                            a#onLogin.waves-effect.waves-light.white-text.btn.right.yahei.action 登陆
+                            div#onLogining.preloader-wrapper.small.right
+                                div.spinner-layer.spinner-red-only
+                                    div.circle-clipper.left
+                                        div.circle
+                                    div.gap-patch
+                                        div.circle
+                                    div.circle-clipper.right
+                                        div.circle
+                            div#res1.yahei.right.resNsg
+        //slider bg
+        div.slider.fullscreen
+            ul.slides
+                each s in slides
+                    li
+                        img(src=s.img)
+
+    script.
+        var g_bind
+
+    -if(jsapi=="ding")
+        script(src="//g.alicdn.com/ilw/ding/0.9.2/scripts/dingtalk.js")
+        p#jsapi_config.hide=jsapi_config
+        script.
+            (function () {
+                var config = JSON.parse($("p#jsapi_config").text())
+                dd.config({
+                    agentId: '8714498',
+                    corpId: config.corpId,
+                    timeStamp: config.timeStamp,
+                    nonceStr: config.nonceStr,
+                    signature: config.signature,
+                    jsApiList: ['runtime.permission.requestAuthCode',
+                        'device.notification.confirm',
+                        'device.notification.alert',
+                        'device.notification.prompt',
+                        'biz.chat.chooseConversation',
+                        'biz.ding.post']
+                });
+                dd.ready(function () {
+                    dd.runtime.permission.requestAuthCode({
+                        corpId: config.corpId,
+                        onSuccess: function (result) {
+                            ajax('/login?code='+result.code,'POST', function (err, res) {
+                                if (err) console.log(err)
+                                res = JSON.parse(res)
+                                if (res.result == 200) {
+                                    swal({
+                                        title: "登陆成功！",
+                                        type: 'success',
+                                        showConfirmButton: false,
+                                        allowOutsideClick: true,
+                                        timer: 820
+                                    })
+                                    setTimeout(function(){
+                                        return window.location.replace("/admin")
+                                    }, 820);
+                                }
+                                if(res.result == 403)
+                                    g_bind={userid:res.userid,key:res.key}
+                                if(res.result == 500)
+                                    swal("钉钉免登失败", "请尝试手动登陆。(error code:500)", "error");
+                            })
+                        },
+                        onFail: function (err) {
+                            swal("钉钉免登失败", "请尝试手动登陆。("+JSON.stringify(err)+")", "error");
+                        }
+                    })
+                })
+                dd.error(function (err) {
+                    swal("DingTalk Error", JSON.stringify(err), "error");
+                });
+            })()
+
+    script.
+        $(function(){
+            $('.slider').slider({full_width: true,interval:3000,indicators:false})
+            $('#toForget').click(function(){$("html,body").animate({scrollTop:0},600)})
+
+            $("#onLogin").click(function () {
+                var usr = $("#usr").val()
+                var pwd = hex_sha1($("#pwd").val())
+                if(!usr||!pwd) return Materialize.toast('请填写完整信息~', 4000)
+                $("#onLogining").addClass("active")
+                ajax("/login?rd="+Math.random().toString(36).substr(2),'POST',{usr: usr, pwd: pwd},function(err,res){
+                    $("#onLogining").removeClass("active")
+                    if(err) console.log(err)
+                    res=JSON.parse(res)
+                    if(res.result==200){
+                        if(g_bind) {
+                            swal({
+                                title: "尚未绑定钉钉账号",
+                                text: "是否需要与钉钉账号 "+g_bind.userid+" 绑定？绑定后可在钉钉APP免密登陆。",
+                                type: "info",
+                                cancelButtonText: "暂时不用",
+                                confirmButtonText: "绑定",
+                                showCancelButton: true,
+                                closeOnConfirm: false,
+                                showLoaderOnConfirm: true,
+                                confirmButtonColor: "#26a69a",
+                            }, function () {
+                                ajax('/admin/ding', 'PUT', {
+                                    job: g_bind.userid,
+                                    key:g_bind.key
+                                }, function (err, res) {
+                                    if (err) console.log(err)
+                                    res = JSON.parse(res)
+                                    if(res.result==200){
+                                        swal({title:"绑定成功！",type:'success',showConfirmButton: false,allowOutsideClick:true,timer:820})
+                                        return window.location.replace("/admin")
+                                    }
+                                })
+                            });
+                        }else
+                            return window.location = "/admin"/*?rd="+Math.random().toString(36).substr(2)*/
+                    }
+                    else{
+                        return swal({title:"账户或密码错误~",type:'error',showConfirmButton: false,allowOutsideClick:true,timer:820})
+                    }
+                })
+            })
+
+            $("#i3").blur(function(){
+                if($("#i3").val()!=$("#i4").val()){
+                    $("#i4").toggleClass("invalid",true)
+                }else{
+                    $("#i4").toggleClass("invalid",false)
+                }
+            })
+
+            $("#i4").blur(function(){
+                if($("#i3").val()!=$("#i4").val()){
+                    $("#i4").toggleClass("invalid",true)
+                }else{
+                    $("#i4").toggleClass("invalid",false)
+                }
+            })
+
+            $("#onForget").click(function () {
+                if(!$("#i2").val()||!$("#i3").val()||!$("#i4").val())
+                    return Materialize.toast('请填写完整信息~', 4000)
+                if($("#i3").val()!=$("#i4").val())
+                    return Materialize.toast('两次输入密码不匹配。', 4000)
+                $("#onForgeting").addClass("active")
+                var ifMsg=$("#onForgetByMobile").prop('checked')
+                ajax('/t?rd='+Math.random().toString(36).substr(2),'PUT',{idf:$("#i2").val(),pwd:hex_sha1($("#i3").val()),ifMsg:(ifMsg?"xx":"x")},function(err,res){
+                    $("#onForgeting").removeClass("active")
+                    if(err) console.log(err)
+                    res=JSON.parse(res)
+                    if(res.result==200){
+                        return swal({
+                            title:"邮件发送成功！",
+                            text:'请尽快查看邮箱并按提示操作，1小时内有效owo',
+                            cancelButtonText:"关闭",
+                            confirmButtonText:"转到邮箱",
+                            confirmButtonColor:"#26a69a",
+                            showCancelButton:true,
+                            type:"success"},
+                        function(isConfirm){
+                            if (isConfirm) {
+                                return window.location ="http://mail."+res.em
+                            }
+                        })
+                    }
+                    if(res.result==201){
+                        var ajaxFlag=false
+                        var SmsTimer=60
+                        var resendTimer=setInterval(function(){
+                            if(SmsTimer<=0){
+                                jQuery('.sweet-alert a.sweet-alert-resend').html("没收到短信？").removeClass("grey-text")
+                                SmsTimer=60
+                                return clearInterval(resendTimer)
+                            }
+                            SmsTimer--
+                            jQuery('.sweet-alert a.sweet-alert-resend').html("没收到短信？("+SmsTimer+"s)")
+                        },1000)
+                        return swal({
+                            title:"信息发送成功！",
+                            text:'请填写6位的验证码，10分钟内有效。<a class="btn-flat waves-effect grey-text sweet-alert-resend" style="height: inherit;line-height: inherit;padding: 0">没收到短信？(60s)</a>',
+                            html:true,
+                            confirmButtonColor:"#26a69a",
+                            cancelButtonText:"取消",
+                            confirmButtonText:"提交",
+                            showCancelButton:true,
+                            closeOnConfirm: false,
+                            inputPlaceholder: "验证码",
+                            type:"input"},
+                        function(value){
+                            if(typeof (value)=="boolean"&&!value)
+                                return clearInterval(resendTimer)
+                            if(!value)
+                                return swal.showInputError("请填写验证码_(:зゝ∠)_")
+                            if(value.length!=6)
+                                return swal.showInputError("请正确填写6位验证码_(:зゝ∠)_")
+                            if(ajaxFlag) return 0
+                            ajaxFlag=true
+                            ajax("/t/"+value,'GET',function(err,res){
+                                ajaxFlag=false
+                                if(err) console.log(err)
+                                res=JSON.parse(res)
+                                if(res.result==200){
+                                    return window.location ="/admin"
+                                }
+                                if(res.result==404){
+                                    return swal.showInputError("验证码错误~可考虑使用邮箱验证。_(:зゝ∠)_")
+                                }
+                            })
+                        })
+                    }
+                    if(res.result==304&&ifMsg){
+                        return swal({title:"发送失败x_x",text:'操作次数过于频繁（>3），请使用邮箱验证。',type:'error',confirmButtonColor:"#26a69a",/*,allowOutsideClick:true,timer:820*/})
+                    }
+                    if(res.result==500){
+                        return swal({title:"发送失败x_x",text:'由于未知的原因出现了错误，请稍后再试。',type:'error',confirmButtonColor:"#26a69a",/*,allowOutsideClick:true,timer:820*/})
+                    }
+                    else{
+                        return swal({title:"信息有误，请检查后再填写。",type:'error',showConfirmButton: false,allowOutsideClick:true,timer:820})
+                    }
+                })
+            })
+        })
+
+        function ajax(path, method, data, callback) {
+            if (!callback) callback = data
+            $.ajax({
+                url: path, type: method, cache: false, data: data,
+                beforeSend: function () {
+                    jQuery("footer>.ajaxLoad").fadeIn(200)
+                },
+                complete: function (res) {
+                    jQuery("footer>.ajaxLoad").fadeOut(200)
+                    if (res.status == 0) Materialize.toast('网络故障……', 4000)
+                    if (res.status == 403) Materialize.toast('服务器残忍地拒绝了这次请求', 4000)
+                    if (res.status == 404) Materialize.toast('服务器懵逼了', 4000)
+                    if (res.status == 500) Materialize.toast('服务器傻掉了', 4000)
+                    callback(res.responseText.code, res.responseText)
+                }
+            })
+        }

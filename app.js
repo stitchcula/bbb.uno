@@ -25,6 +25,8 @@ for(var r in routes){
 }
 
 const app=new Koa()
+app.proxy='nginx'
+app.keys=['stcula','toy']
 app.use(async (ctx,next)=>{
     console.log(ctx.ip+" "+ctx.method+" "+ctx.path+" at "+new Date().toLocaleString())
     ctx.redis=redis

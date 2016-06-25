@@ -28,7 +28,15 @@ router.get('/',async (ctx,next)=>{
                 user:res.body,
                 without_footer:1,
                 room_name:roomMsg.name,
-                room_time:roomMsg.time
+                room_time:roomMsg.time,
+                title:"BBB - uno房间",
+                default_face:"/static/img/default_face.jpg",
+                title_img:"/static/img/login_title_img.jpg",
+                slides:[
+                    {img:"/static/img/bg1.jpg"},
+                    {img:"/static/img/bg2.jpg"},
+                    {img:"/static/img/bg3.jpg"}
+                ]
             })
     }else
         ctx.render('hall',{

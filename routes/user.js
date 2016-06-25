@@ -9,7 +9,7 @@ const router=new Router()
 const proxyHost="http://iot.shibeta.org:806"
 
 router.post('/signup',async (ctx,next)=>{
-    var res=await request({uri:proxyHost+ctx.path+"?token=000000000000000000000000000000",
+    var res=await request({uri:proxyHost+ctx.path+"?token=000000000000000000000000",
         method:"POST",body:JSON.stringify(await parse.json(ctx))})
     res.body=JSON.parse(res.body)
     if(res.body.result==200){
@@ -18,7 +18,8 @@ router.post('/signup',async (ctx,next)=>{
         res2.body=JSON.parse(res2.body)
         if(res2.body.result==200){
             ctx.body=res.body
-            ctx.session.token=res.body.token.substring(6,24)
+            ctx.session.token=ctx.body.token.substring(6,24)
+            ctx.session.uin=ctx.body.uin
         }
     }else
         ctx.body=res
@@ -39,10 +40,11 @@ router.get('/login',async (ctx,next)=>{
     })
     await next()
 }).post('/login',async (ctx,next)=>{
-    var res=await request({uri:proxyHost+ctx.path+"?token=000002000000000000000000000000",
+    var res=await request({uri:proxyHost+ctx.path+"?token=000002000000000000000000",
         method:"POST",body:JSON.stringify(await parse.json(ctx))})
-    ctx.body=res.body
-    ctx.session.token=res.body.token.substring(6,24)
+    ctx.body=JSON.parse(res.body)
+    ctx.session.token=ctx.body.token.substring(6,24)
+    ctx.session.uin=ctx.body.uin
     await next();
 })
 

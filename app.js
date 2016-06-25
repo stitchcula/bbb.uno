@@ -53,7 +53,7 @@ app.use(convert(mongo({
     port:process.env['MONGO_PORT']||27017,
     //user:process.env['MONGO_USER']||"root",
     //pass:process.env['MONGO_PWD']||"",
-    db:"uno_room"
+    db:"bbbuno"
 })))
 
 app.use(convert(session({store:{host:process.env.REDIS_HOST,port:process.env.REDIS_PORT,ttl:3600*6,auth:process.env.REDIS_AUTH}})))

@@ -85,7 +85,7 @@ block style
 block content
     main
         div.row.hall.yahei
-            div.col.l5.offset-l2.m7.offset-m1.s8
+            div.col.l5.offset-l2.m7.offset-m1.s12
                 div.card-panel.white.rooms
                     div.row
                         div.col.s8
@@ -102,7 +102,7 @@ block content
                                         div.room-block.hoverable.grey.lighten-3
                                             div
                                                 p 进入房间
-            div.col.l3.m3.s4
+            div.col.l3.m3.s12
                 div.card-panel.white.user
                     div.row
                         div.col.s12
@@ -156,15 +156,15 @@ block content
                                 return swal.showInputError("太♂长了不好使_(:зゝ∠)_")
                             if (ajaxFlag) return 0
                             ajaxFlag = true
-                            ajax("/t/" + value, 'GET', function (err, res) {
+                            ajax("/m/room", 'POST', function (err, res) {
                                 ajaxFlag = false
                                 if (err) console.log(err)
                                 res = JSON.parse(res)
                                 if (res.result == 200) {
-                                    return window.location = "/admin"
+                                    return window.location = "/m"
                                 }
-                                if (res.result == 404) {
-                                    return swal.showInputError("验证码错误~可考虑使用邮箱验证。_(:зゝ∠)_")
+                                if (res.result == 403) {
+                                    return swal.showInputError("房间名称长度不对啦。_(:зゝ∠)_")
                                 }
                             })
                         })

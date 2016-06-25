@@ -21,7 +21,7 @@ router.get('/',async (ctx,next)=>{
     var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
     res.body=JSON.parse(res.body)
     if(ctx.session.room) {
-        var roomMsg=JSON.parse(ctx.redis.hgetall(ctx.session.room))
+        var roomMsg=JSON.parse(ctx.redis.get(ctx.session.room))
         if(roomMsg.state==1)
             ctx.render('play',{user:res.body,without_footer:1})
         if(roomMsg.state==0)
@@ -78,19 +78,19 @@ router.get('/room',async (ctx,next)=>{
     // user's uin -> mongo room list -> redis room msg
     ctx.session.room=roomMsg.sid
     await ctx.mongo.collection('rooms').insertOne({name:roomMsg.name,sid:roomMsg.sid,member:1})
-    await ctx.redis.hmset(roomMsg.sid,JSON.stringify(roomMsg))
+    await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     ctx.body={result:200}
     await next();
 }).put('/room',async (ctx,next)=>{
     var {name,sid}=await parse.json(ctx)
-    var roomMsg=JSON.parse(ctx.redis.hgetall(sid))
+    var roomMsg=JSON.parse(ctx.redis.get(sid))
     if(roomMsg.members.find(it=>it==ctx.session.uin))
         return ctx.body={result:406} //重复进入
     if(!(roomMsg.state==0&&roomMsg.members.length<roomMsg.limit))
         return ctx.body={result:423} //锁定房间
     ctx.session.room=roomMsg.sid
     roomMsg.members.push(ctx.session.uin)
-    await ctx.redis.hmset(roomMsg.sid,JSON.stringify(roomMsg))
+    await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
         {"$set": {member:roomMsg.members.length}}, {upsert: true})
     ctx.body={result:200}
@@ -98,14 +98,14 @@ router.get('/room',async (ctx,next)=>{
 }).del('/room',async (ctx,next)=>{
     if(!ctx.session.room)
         return ctx.body={result:403}
-    var roomMsg=JSON.parse(ctx.redis.hgetall(ctx.session.room))
+    var roomMsg=JSON.parse(ctx.redis.get(ctx.session.room))
     if(roomMsg.state!=0)
         return ctx.body={result:403}
     delete ctx.session.room
     for(var i=0;i<roomMsg.members.length;i++)
         if(roomMsg.members[i]==ctx.session.uin)
             roomMsg.members.splice(i,1)
-    await ctx.redis.hmset(roomMsg.sid,JSON.stringify(roomMsg))
+    await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
         {"$set": {member:roomMsg.members.length}}, {upsert: true})
     ctx.body={result:200}

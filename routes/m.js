@@ -17,7 +17,8 @@ router.use('/',async (ctx,next)=>{
 })
 
 router.get('/',async (ctx,next)=>{
-    var res=await request({uri:proxyHost+ctx.path+"?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
+    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
+    res.body=JSON.parse(res.body)
     if(ctx.session.room) {
         var room=ctx.redis.hgetall(ctx.session.room)
         if(room.state==1)

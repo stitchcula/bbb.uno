@@ -44,6 +44,8 @@ app.use(async (ctx,next)=>{
         else
             ctx.body="500"
     }
+    if(ctx.status==404)
+        ctx.redirect('/m')
 })
 
 app.use(convert(mongo({

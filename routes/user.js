@@ -73,6 +73,7 @@ router.del('/',async (ctx,next)=>{
 
 router.get('/test',async (ctx,next)=>{
     ctx.render('hall',{
+        user:{"nuc_uno":{"uin":"89397247","group":["member"],"permission":null,"game":0,"win":0,"level":0},"nuc_base":{"uin":"89397247","group":["member"],"permission":null,"account":"逗逗逗比逗","email":null,"tel":"15675131613","pass":"842697135"}},
         without_footer:1,
         title:"BBB - uno大厅",
         default_face:"/static/img/default_face.jpg",

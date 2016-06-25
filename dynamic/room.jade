@@ -148,7 +148,7 @@ block content
             $('.slider').slider({full_width: true, interval: 3000, indicators: false})
 
             $('.btn.max-btn').eq(1).click(function () {
-                ajaxFlag = true
+                var ajaxFlag = true
                 ajax("/m/room", 'DELETE', function (err, res) {
                     ajaxFlag = false
                     if (err) console.log(err)

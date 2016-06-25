@@ -135,6 +135,7 @@ block content
             $('.slider').slider({full_width: true,interval:3000,indicators:false})
 
             $('.btn.max-btn').eq(1).click(function () {
+                var ajaxFlag=false
                 return swal({
                             title: "创建房间",
                             text: '请填写房间名称',
@@ -156,7 +157,7 @@ block content
                                 return swal.showInputError("太♂长了不好使_(:зゝ∠)_")
                             if (ajaxFlag) return 0
                             ajaxFlag = true
-                            ajax("/m/room", 'POST', function (err, res) {
+                            ajax("/m/room", 'POST',JSON.stringify({name:value}), function (err, res) {
                                 ajaxFlag = false
                                 if (err) console.log(err)
                                 res = JSON.parse(res)

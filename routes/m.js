@@ -3,6 +3,8 @@
  */
 
 import Router from 'koa-router'
+import request from 'co-request'
+import parse from 'co-body'
 
 const router=new Router()
 
@@ -23,7 +25,18 @@ router.get('/',async (ctx,next)=>{
         if(room.state==0)
             ctx.render('room',{user:res.body,without_footer:1})
     }else
-        ctx.render('hall',{user:res.body,without_footer:1})
+        ctx.render('hall',{
+            user:res.body,
+            without_footer:1,
+            title:"BBB - uno大厅",
+            default_face:"/static/img/default_face.jpg",
+            title_img:"/static/img/login_title_img.jpg",
+            slides:[
+                {img:"/static/img/bg1.jpg"},
+                {img:"/static/img/bg2.jpg"},
+                {img:"/static/img/bg3.jpg"}
+            ]
+        })
     await next()
 })
 

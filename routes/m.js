@@ -20,7 +20,8 @@ router.use('/',async (ctx,next)=>{
 router.get('/',async (ctx,next)=>{
     var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
     res.body=JSON.parse(res.body)
-    if(ctx.session.room) {
+    if(res.body.nuc_uno.room.length>6) {
+        ctx.session.room=res.body.nuc_uno.room
         var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
         if(roomMsg.state==1)
             ctx.render('play',{user:res.body,without_footer:1})
@@ -101,6 +102,8 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     }
     // user's uin -> mongo room list -> redis room msg
     ctx.session.room=roomMsg.sid
+    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token,
+        method:'PUT',body:JSON.stringify({nuc_uno:{room:ctx.session.room}})})
     await ctx.mongo.collection('rooms').insertOne({name:roomMsg.name,sid:roomMsg.sid,member:1,limit:8,state:0})
     await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     ctx.body={result:200}
@@ -113,6 +116,8 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     if(!(roomMsg.state==0&&roomMsg.members.length<roomMsg.limit))
         return ctx.body={result:423} //锁定房间
     ctx.session.room=roomMsg.sid
+    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token,
+        method:'PUT',body:JSON.stringify({nuc_uno:{room:ctx.session.room}})})
     roomMsg.members.push(ctx.session.uin)
     await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
@@ -125,6 +130,9 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
     if(roomMsg.state!=0)
         return ctx.body={result:403}
+    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token,
+        method:'PUT',body:JSON.stringify({nuc_uno:{room:""}})})
+    res.body=JSON.parse(res.body)//todo:check response
     delete ctx.session.room
     for(var i=0;i<roomMsg.members.length;i++)
         if(roomMsg.members[i]==ctx.session.uin)

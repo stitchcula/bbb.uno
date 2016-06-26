@@ -197,7 +197,7 @@ block content
 
             $(".rooms-content .room-content").eq(0).find(".room-in").click(function () {
                 var ajaxFlag = true
-                ajax("/m/room", 'PUT',JSON.stringify({sid:$(this).find("p").eq(2).html()}), function (err, res) {
+                ajax("/m/room", 'PUT',JSON.stringify({sid:$(this).closest(".room-block").find("p").eq(2).html()}), function (err, res) {
                     ajaxFlag = false
                     if (err) console.log(err)
                     res = JSON.parse(res)

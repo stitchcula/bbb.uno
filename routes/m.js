@@ -23,6 +23,13 @@ router.get('/',async (ctx,next)=>{
     if(ctx.userMsg.nuc_uno.room&&ctx.userMsg.nuc_uno.room.length>14) {
         ctx.session.room=ctx.userMsg.nuc_uno.room
         var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
+        if(!roomMsg){
+            ctx.userMsg.nuc_uno.room=""
+            var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,
+                method:'PUT',body:JSON.stringify(ctx.userMsg)})
+            ctx.session.room=null
+            return ctx.redirect('/m')
+        }
         if(roomMsg.state==1)
             ctx.render('play',{user:ctx.userMsg,without_footer:1})
         if(roomMsg.state==0)

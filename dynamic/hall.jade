@@ -43,18 +43,38 @@ block style
                                 cursor: pointer;
                         .rooms-content
                             height calc(100% - 81px)!important
+                            border 1px solid #cccccc
                             .rooms-content-scroll
                                 margin 0 auto
                                 height: 100%
                                 overflow-y scroll
-                            .col
+                            .col.room-content:first-of-type
+                                display: none
+                            .col.room-content
                                 padding 0.8rem
                                 .room-block
                                     position relative
-                                    height 8rem
+                                    height 9.2rem
                                     width 8rem
                                     border-radius 3px
                                 .room-block
+                                    >p
+                                        margin 0 auto
+                                        display block
+                                        position absolute
+                                        text-align: center
+                                        width 80%
+                                        left 10%
+                                        z-index 2
+                                        color #FFFFFF
+                                    >p:first-of-type
+                                        top 10%
+                                    >p:last-of-type
+                                        top 60%
+                                    >img
+                                        z-index 1
+                                        position absolute
+                                        top 0
                                     > div
                                         transition 0.6s ease-out
                                         position absolute
@@ -66,6 +86,7 @@ block style
                                         background #FFFFFF
                                         opacity 0.5
                                         cursor pointer
+                                        z-index 2
                                         p
                                             margin 0 auto
                                             text-align:center
@@ -97,11 +118,14 @@ block content
                     div.rooms-content
                         div.rooms-content-scroll
                             div.row
-                                -for(var i=0;i<25;i++)
-                                    div.col
-                                        div.room-block.hoverable.grey.lighten-3
-                                            div
-                                                p 进入房间
+                                div.col.room-content
+                                    div.room-block.hoverable.z-depth-1
+                                        p N/a
+                                        p N/a
+                                        p.hide N/a
+                                        img.responsive-img(src="/static/img/room.png")
+                                        div.room-in
+                                            p 进入房间
             div.col.l3.m3.s12
                 div.card-panel.white.user
                     div.row
@@ -165,17 +189,59 @@ block content
                                     return window.location = "/m"
                                 }
                                 if (res.result == 403) {
-                                    return swal.showInputError("房间名称长度不对啦。_(:зゝ∠)_")
+                                    return swal.showInputError("看起来有奇怪的字符串。_(:зゝ∠)_")
                                 }
                             })
                         })
             })
+
+            $(".rooms-content .room-content").eq(0).find(".room-in").click(function () {
+                var ajaxFlag = true
+                ajax("/m/room", 'PUT',JSON.stringify({sid:$(this).find("p").eq(2).html()}), function (err, res) {
+                    ajaxFlag = false
+                    if (err) console.log(err)
+                    res = JSON.parse(res)
+                    if (res.result == 200) {
+                        return window.location = "/m"
+                    }
+                    if (res.result == 403) {
+                        return 0
+                    }
+                })
+            })
+
+            var hPoll=setInterval(function () {
+                var ajaxFlag = true
+                ajax("/m/room", 'GET', function (err, res) {
+                    ajaxFlag = false
+                    if (err) console.log(err)
+                    res = JSON.parse(res)
+                    if (res.result == 200) {
+                        res.rooms=JSON.parse(res.rooms)
+                        return rooms_render(res.rooms)
+                    }
+                    if (res.result == 403) {
+                        return 0
+                    }
+                })
+            },1000)
+
+            function rooms_render(arr) {
+                $(".rooms-content .room-content.clone").remove()
+                for (var i = 0; i < arr.length; i++) {
+                    $(".rooms-content .room-content").eq(0).find("p").eq(0).html(arr[i].name)
+                    $(".rooms-content .room-content").eq(0).find("p").eq(1).html("【" + arr[i].members.length + "/" + arr[i].limit + "】")
+                    $(".rooms-content .room-content").eq(0).find("p").eq(2).html(arr[i].sid)
+                    $(".rooms-content-scroll .row").append($(".rooms-content .room-content").eq(0).clone(true))
+                    $(".rooms-content .room-content").eq(i + 1).addClass("clone")
+                }
+            }
         })()
 
         function ajax(path, method, data, callback) {
             if (!callback) callback = data
             $.ajax({
-                url: path, type: method, cache: false, data: data, contentType: "application/json;charset=utf-8",
+                url: path, type: method, cache: false, data: data,
                 beforeSend: function () {
                     jQuery("footer>.ajaxLoad").fadeIn(200)
                 },
@@ -185,6 +251,11 @@ block content
                     if (res.status == 403) Materialize.toast('服务器残忍地拒绝了这次请求', 4000)
                     if (res.status == 404) Materialize.toast('服务器懵逼了', 4000)
                     if (res.status == 500) Materialize.toast('服务器傻掉了', 4000)
+                    if (res.status == 200) try {
+                        JSON.parse(res.responseText)
+                    } catch (e) {
+                        jQuery('main').append(res.responseText)
+                    }
                     callback(res.responseText.code, res.responseText)
                 }
             })

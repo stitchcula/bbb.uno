@@ -18,6 +18,7 @@ router.post('/signup',async (ctx,next)=>{
         res2.body=JSON.parse(res2.body)
         if(res2.body.result==200){
             ctx.body=res.body
+            ctx.session={}
             ctx.session.token=ctx.body.token.substring(6,24)
             ctx.session.uin=ctx.body.uin
         }
@@ -43,6 +44,7 @@ router.get('/login',async (ctx,next)=>{
     var res=await request({uri:proxyHost+ctx.path+"?token=000002000000000000000000",
         method:"POST",body:JSON.stringify(await parse.json(ctx))})
     ctx.body=JSON.parse(res.body)
+    ctx.session={}
     ctx.session.token=ctx.body.token.substring(6,24)
     ctx.session.uin=ctx.body.uin
     await next();
@@ -72,7 +74,7 @@ router.del('/',async (ctx,next)=>{
 })
 
 router.get('/test',async (ctx,next)=>{
-    ctx.render('room',{
+    ctx.render('hall',{
         user:{"nuc_uno":{"uin":"89397247","group":["member"],"permission":null,"game":0,"win":0,"level":0},"nuc_base":{"uin":"89397247","group":["member"],"permission":null,"account":"逗逗逗比逗","email":null,"tel":"15675131613","pass":"842697135"}},
         without_footer:1,
         title:"BBB - uno大厅",

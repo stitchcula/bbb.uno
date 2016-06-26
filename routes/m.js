@@ -21,7 +21,7 @@ router.get('/',async (ctx,next)=>{
     var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
     res.body=JSON.parse(res.body)
     if(ctx.session.room) {
-        var roomMsg=JSON.parse(ctx.redis.get(ctx.session.room))
+        var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
         if(roomMsg.state==1)
             ctx.render('play',{user:res.body,without_footer:1})
         if(roomMsg.state==0)
@@ -56,8 +56,32 @@ router.get('/',async (ctx,next)=>{
 })
 
 //room get(delete) new in out
-router.get('/room',async (ctx,next)=>{
-
+router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
+    if(!ctx.query.sid){
+        var roomsMsg=await ctx.mongo.collection('rooms').find({member:{$gt:0,$lte:8},state:0}).limit(24).toArray()
+        ctx.body={result:200,rooms:roomsMsg}
+    }else{
+        if(!ctx.query.limit){
+            if(!ctx.session.room||ctx.session.room!=ctx.query.sid)
+                return ctx.body={result:403}
+            var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
+            delete roomMsg.cards
+            delete roomMsg.seq
+            delete roomMsg.discards
+            ctx.body={result:200,room:roomMsg}
+        }else{
+            if(!ctx.session.room||ctx.session.room!=ctx.query.sid)
+                return ctx.body={result:403}
+            var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
+            if(roomMsg.members[0]!=ctx.session.uin)
+                return ctx.body={result:403}
+            roomMsg.limit=parseInt(ctx.query.limit)
+            await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
+            await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
+                {"$set": {limit:roomMsg.limit}}, {upsert: true})
+            ctx.body={result:200}
+        }
+    }
     await next();
 }).post('/room',async (ctx,next)=>{
     var {name,sid}=await parse.json(ctx)
@@ -77,13 +101,13 @@ router.get('/room',async (ctx,next)=>{
     }
     // user's uin -> mongo room list -> redis room msg
     ctx.session.room=roomMsg.sid
-    await ctx.mongo.collection('rooms').insertOne({name:roomMsg.name,sid:roomMsg.sid,member:1})
+    await ctx.mongo.collection('rooms').insertOne({name:roomMsg.name,sid:roomMsg.sid,member:1,limit:8,state:0})
     await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     ctx.body={result:200}
     await next();
 }).put('/room',async (ctx,next)=>{
     var {name,sid}=await parse.json(ctx)
-    var roomMsg=JSON.parse(ctx.redis.get(sid))
+    var roomMsg=JSON.parse(await ctx.redis.get(sid))
     if(roomMsg.members.find(it=>it==ctx.session.uin))
         return ctx.body={result:406} //重复进入
     if(!(roomMsg.state==0&&roomMsg.members.length<roomMsg.limit))
@@ -98,7 +122,7 @@ router.get('/room',async (ctx,next)=>{
 }).del('/room',async (ctx,next)=>{
     if(!ctx.session.room)
         return ctx.body={result:403}
-    var roomMsg=JSON.parse(ctx.redis.get(ctx.session.room))
+    var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
     if(roomMsg.state!=0)
         return ctx.body={result:403}
     delete ctx.session.room

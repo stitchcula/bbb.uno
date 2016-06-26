@@ -300,7 +300,7 @@ block content
         function ajax(path, method, data, callback) {
             if (!callback) callback = data
             $.ajax({
-                url: path, type: method, cache: false, data: data,contentType:"application/json;charset=utf-8",
+                url: path, type: method, cache: false, data: data,
                 beforeSend: function () {
                     jQuery("footer>.ajaxLoad").fadeIn(200)
                 },
@@ -310,6 +310,11 @@ block content
                     if (res.status == 403) Materialize.toast('服务器残忍地拒绝了这次请求', 4000)
                     if (res.status == 404) Materialize.toast('服务器懵逼了', 4000)
                     if (res.status == 500) Materialize.toast('服务器傻掉了', 4000)
+                    if (res.status == 200) try {
+                        JSON.parse(res.responseText)
+                    } catch (e) {
+                        jQuery('main').append(res.responseText)
+                    }
                     callback(res.responseText.code, res.responseText)
                 }
             })

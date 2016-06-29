@@ -210,7 +210,12 @@ block content
                 })
             })
 
+            rooms_loop()
             var hPoll=setInterval(function () {
+                rooms_loop()
+            },1000)
+
+            function rooms_loop(){
                 var ajaxFlag = true
                 ajax("/m/room", 'GET', function (err, res) {
                     ajaxFlag = false
@@ -223,7 +228,7 @@ block content
                         return 0
                     }
                 })
-            },1000)
+            }
 
             function rooms_render(arr) {
                 $(".rooms-content .room-content.clone").remove()

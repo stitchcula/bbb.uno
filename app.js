@@ -9,6 +9,8 @@ import mongo from 'koa-mongo'
 import convert from 'koa-convert'
 import serve from 'koa-static'
 import jade from 'jade'
+import shield from './middleware/shield.js'
+
 
 var redis=require('co-redis')((()=>{
     var _=require('redis').createClient(
@@ -57,6 +59,7 @@ app.use(convert(mongo({
 })))
 
 app.use(convert(session({store:{host:process.env.REDIS_HOST,port:process.env.REDIS_PORT,ttl:3600*6,auth:process.env.REDIS_AUTH}})))
+app.use(shield)
 app.use(convert(serve(__dirname + '/dynamic')))
 app.use(convert(serve(__dirname)))
 app.use(router.routes())

@@ -129,12 +129,13 @@ block content
                                 -for(var i=0;i<8;i++)
                                     div.col.user-content
                                         div.user-block.hoverable.z-depth-1.valign-wrapper(state="nobody")
-                                            p.p1.black-text="测试者1"
-                                            p.p2.blue-text="Lv6"
+                                            p.uin.hide
+                                            p.p1.black-text N/a
+                                            p.p2.blue-text N/a
                                             i.material-icons.valign close
                                             img.responsive-img.left(src="/static/img/space.png")
                                             div.progress
-                                                p 21/54
+                                                p N/a
                                                 div.determinate(style="width:50%")
 
             div.col.l3.m3.s12
@@ -169,6 +170,33 @@ block content
         (function () {
             $('.slider').slider({full_width: true, interval: 3000, indicators: false})
 
+            $(".users-content .user-content .user-block").click(function () {
+                if($(".users-content .user-content .user-block p.uin").eq(0).html()!=$(".user p.uin").html())
+                    return 0
+                switch ($(this).attr("state")){
+                    case "nobody":
+                        if($(".users-content .user-content .user-block[state='disable']").length<7)
+                            $(this).attr("state","disable")
+                        break
+                    case "disable":
+                        $(this).attr("state","nobody")
+                        break
+                }
+                var limit=8-$(".users-content .user-content .user-block[state='disable']").length
+                var ajaxFlag = true
+                ajax("/m/room?sid=" + $(".room p.sid").html()+"&limit="+limit, 'GET', function (err, res) {
+                    ajaxFlag = false
+                    if (err) console.log(err)
+                    res = JSON.parse(res)
+                    if (res.result == 200) {
+                        return 0
+                    }
+                    if (res.result == 403) {
+                        return 0
+                    }
+                })
+            })
+
             users_loop(1)
             var hPoll = setInterval(function () {
                 users_loop(0)
@@ -195,9 +223,10 @@ block content
                 for (var i = 0; i < arr.length; i++) {
                     if($(".users-content .user-content .user-block").eq(i).attr("state")=="nobody"){
                         $(".users-content .user-content .user-block").eq(i).attr("state","someone")
-                        $(".users-content .user-content .user-block").eq(i).find("p").eq(0).html(arr[i].name)
-                        $(".users-content .user-content .user-block").eq(i).find("p").eq(1).html("Lv"+arr[i].level)
-                        $(".users-content .user-content .user-block").eq(i).find("p").eq(2).html(arr[i].win+"/"+arr[i].game)
+                        $(".users-content .user-content .user-block").eq(i).find("p").eq(0).html(arr[i].uin)
+                        $(".users-content .user-content .user-block").eq(i).find("p").eq(1).html(arr[i].account)
+                        $(".users-content .user-content .user-block").eq(i).find("p").eq(2).html("Lv"+arr[i].level)
+                        $(".users-content .user-content .user-block").eq(i).find("p").eq(3).html(arr[i].win+"/"+arr[i].game)
                         $(".users-content .user-content .user-block").eq(i).find("div.determinate").css("width",arr[i].win/(arr[i].game==0?1:arr[i].game)*100+"%")
                         $(".users-content .user-content .user-block").eq(i).find("img").attr("src","/static/img/default_face.jpg")
                     }

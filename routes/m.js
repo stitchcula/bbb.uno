@@ -121,9 +121,8 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     }
     // user's uin -> mongo room list -> redis room msg
     ctx.session.room=roomMsg.sid
-    ctx.userMsg.nuc_uno.room=ctx.session.room
-    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,
-        method:'PUT',body:JSON.stringify(ctx.userMsg)})
+    var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").updateOne({uin:ctx.session.uin},
+        {"$set":{room:ctx.session.room}},{upsert: true})
     await ctx.mongo.collection('rooms').insertOne({name:roomMsg.name,sid:roomMsg.sid,member:1,limit:8,state:0})
     await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     ctx.body={result:200}
@@ -136,9 +135,8 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     if(!(roomMsg.state==0&&roomMsg.members.length<roomMsg.limit))
         return ctx.body={result:423} //锁定房间
     ctx.session.room=roomMsg.sid
-    ctx.userMsg.nuc_uno.room=ctx.session.room
-    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,
-        method:'PUT',body:JSON.stringify(ctx.userMsg)})
+    var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").updateOne({uin:ctx.session.uin},
+        {"$set":{room:ctx.session.room}},{upsert: true})
     roomMsg.members.push(ctx.session.uin)
     await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
     await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
@@ -151,10 +149,8 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     var roomMsg=JSON.parse(await ctx.redis.get(ctx.session.room))
     if(roomMsg.state!=0)
         return ctx.body={result:403}
-    ctx.userMsg.nuc_uno.room=""
-    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,
-        method:'PUT',body:JSON.stringify(ctx.userMsg)})
-    res.body=JSON.parse(res.body)//todo:check response
+    var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").updateOne({uin:ctx.session.uin},
+        {"$set":{room:""}},{upsert: true})
     delete ctx.session.room
     for(var i=0;i<roomMsg.members.length;i++)
         if(roomMsg.members[i]==ctx.session.uin)

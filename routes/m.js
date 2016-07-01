@@ -83,7 +83,7 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
                 var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").find({uin:roomMsg.members[i]}).toArray()
                 roomMsg.members[i]={
                     uin:roomMsg.members[i],
-                    name:nuc_base[0].name,
+                    name:nuc_base[0].account,
                     game:nuc_uno[0].game,
                     win:nuc_uno[0].win,
                     level:nuc_uno[0].level

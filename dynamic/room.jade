@@ -30,15 +30,26 @@ block style
                                 overflow: auto
                             .col.user-content
                                 padding 0.8rem
+                                .user-block[state="someone"]
+                                    >p
+                                        display block
+                                    > img
+                                        display: block
+                                .user-block[state="someone"]:hover
+                                    > div
+                                        display block
                                 .user-block[state="disable"]
                                     background: #eeeeee
                                     i
                                         display: block
                                 .user-block[state="nobody"]
                                     background: #eeeeee
+                                    img
+                                        display: block
                                 .user-block
+                                    overflow: hidden
                                     position relative
-                                    height 7.9rem
+                                    height 8rem
                                     width 8rem
                                     border-radius 3px
                                     cursor pointer
@@ -49,16 +60,18 @@ block style
                                         margin 0 auto
                                     > p
                                         margin 0 auto
-                                        display block
+                                        display none
                                         position absolute
                                         text-align: center
                                         width 80%
+                                        word-break:break-all
+                                        word-wrap: break-word
                                         left 10%
                                         z-index 2
                                     > p.p1
                                         top 20%
                                     > p.p2
-                                        top 40%
+                                        top 60%
                                     > img
                                         z-index 1
                                         position absolute
@@ -87,9 +100,7 @@ block style
                                             z-index 5
                                         >div
                                             z-index 4
-                                .user-block[state="someone"]:hover
-                                    > div
-                                        display block
+
                     .user
                         min-height 16rem
                         .progress
@@ -116,7 +127,7 @@ block content
                             div.row
                                 -for(var i=0;i<8;i++)
                                     div.col.user-content
-                                        div.user-block.hoverable.z-depth-1.valign-wrapper(state="someone")
+                                        div.user-block.hoverable.z-depth-1.valign-wrapper(state="nobody")
                                             p.p1.black-text="测试者1"
                                             p.p2.blue-text="Lv6"
                                             i.material-icons.valign close
@@ -164,7 +175,7 @@ block content
 
             function users_loop(flag) {
                 var ajaxFlag = true
-                ajax("/m/room?sid="+$(".room p.sid"), 'GET', function (err, res) {
+                ajax("/m/room?sid="+$(".room p.sid").html(), 'GET', function (err, res) {
                     ajaxFlag = false
                     if (err) console.log(err)
                     res = JSON.parse(res)
@@ -181,12 +192,13 @@ block content
                 if(flag&&arr[0]==$(".user p.uin").html())
                     $('.btn.max-btn').eq(0).toggleClass("hide",false)
                 for (var i = 0; i < arr.length; i++) {
-                    if($(".users-content .user-content .user-block").eq(0).attr("state")=="nobody"){
+                    if($(".users-content .user-content .user-block").eq(i).attr("state")=="nobody"){
+                        $(".users-content .user-content .user-block").eq(i).attr("state","someone")
                         $(".users-content .user-content .user-block").eq(i).find("p").eq(0).html(arr[i].name)
                         $(".users-content .user-content .user-block").eq(i).find("p").eq(1).html("Lv"+arr[i].level)
                         $(".users-content .user-content .user-block").eq(i).find("p").eq(2).html(arr[i].win+"/"+arr[i].game)
                         $(".users-content .user-content .user-block").eq(i).find("div.determinate").css("width",arr[i].win/(arr[i].game==0?1:arr[i].game)*100+"%")
-                        $(".users-content .user-content .user-block").eq(0).find("img").attr("src","/static/img/default_face.jpg")
+                        $(".users-content .user-content .user-block").eq(i).find("img").attr("src","/static/img/default_face.jpg")
                     }
                 }
             }

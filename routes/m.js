@@ -14,8 +14,9 @@ const proxyHost="http://iot.shibeta.org:806"
 router.use('/',async (ctx,next)=>{
     if(!(ctx.session&&ctx.session.token))
         return ctx.render('redirectLogin')
-    var res=await request({uri:proxyHost+"/user?token=000002"+ctx.session.token+"&uin="+ctx.session.uin,method:'GET'})
-    ctx.userMsg=JSON.parse(res.body)
+    var nuc_base=await ctx.mongo.db("nuc").collection("nuc_base").find({uin:ctx.session.uin}).toArray()
+    var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").find({uin:ctx.session.uin}).toArray()
+    ctx.userMsg={nuc_base:nuc_base[0],nuc_uno:nuc_uno[0]}
     await next()
 })
 
@@ -37,6 +38,7 @@ router.get('/',async (ctx,next)=>{
                 user:ctx.userMsg,
                 without_footer:1,
                 room_name:roomMsg.name,
+                room_sid:roomMsg.sid,
                 room_time:roomMsg.time,
                 title:"BBB - uno房间",
                 default_face:"/static/img/default_face.jpg",
@@ -67,7 +69,7 @@ router.get('/',async (ctx,next)=>{
 router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
     if(!ctx.query.sid){
         var roomsMsg=await ctx.mongo.collection('rooms').find({member:{$gt:0,$lte:8},state:0}).limit(24).toArray()
-        ctx.body={result:200,rooms:roomsMsg}
+        return ctx.body={result:200,rooms:roomsMsg}
     }else{
         if(!ctx.query.limit){
             if(!ctx.session.room||ctx.session.room!=ctx.query.sid)
@@ -76,7 +78,18 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
             delete roomMsg.cards
             delete roomMsg.seq
             delete roomMsg.discards
-            ctx.body={result:200,room:roomMsg}
+            for(var i=0;i<roomMsg.members.length;i++){
+                var nuc_base=await ctx.mongo.db("nuc").collection("nuc_base").find({uin:roomMsg.members[i]}).toArray()
+                var nuc_uno=await ctx.mongo.db("nuc").collection("nuc_uno").find({uin:roomMsg.members[i]}).toArray()
+                roomMsg.members[i]={
+                    uin:roomMsg.members[i],
+                    name:nuc_base[0].name,
+                    game:nuc_uno[0].game,
+                    win:nuc_uno[0].win,
+                    level:nuc_uno[0].level
+                }
+            }
+            return ctx.body={result:200,room:roomMsg}
         }else{
             if(!ctx.session.room||ctx.session.room!=ctx.query.sid)
                 return ctx.body={result:403}
@@ -87,10 +100,9 @@ router.get('/room',async (ctx,next)=>{//getAll getOne setLimit
             await ctx.redis.set(roomMsg.sid,JSON.stringify(roomMsg))
             await ctx.mongo.collection('rooms').updateOne({sid: roomMsg.sid},
                 {"$set": {limit:roomMsg.limit}}, {upsert: true})
-            ctx.body={result:200}
+            return ctx.body={result:200}
         }
     }
-    await next();
 }).post('/room',async (ctx,next)=>{
     var {name,sid}=await parse.json(ctx)
     if(!/^[\u4E00-\u9FA50-9a-zA-Z_]{4,20}$/.test(name))

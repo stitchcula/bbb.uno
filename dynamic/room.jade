@@ -122,7 +122,7 @@ block content
                 div.card-panel.white.users
                     div.row
                         div.col.s8
-                            blockquote.yahei.grey-text=user_name
+                            blockquote.yahei.grey-text=room_name
                     div.users-content
                         div.users-content-scroll
                             div.row
@@ -218,8 +218,8 @@ block content
             }
 
             function users_render(arr,flag) {
-                if(flag&&arr[0]==$(".user p.uin").html())
-                    $('.btn.max-btn').eq(0).toggleClass("hide",false)
+                if (flag && arr[0].uin == $(".user p.uin").html())
+                    $('.btn.max-btn').eq(0).toggleClass("hide", false)
                 for (var i = 0; i < arr.length; i++) {
                     if($(".users-content .user-content .user-block").eq(i).attr("state")=="nobody"){
                         $(".users-content .user-content .user-block").eq(i).attr("state","someone")

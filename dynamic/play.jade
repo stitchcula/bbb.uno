@@ -3,10 +3,41 @@ extends frag/framework
 block style
     style
         :stylus
-            .yahei
-                font-family "Microsoft YaHei"
+            html, body, main, .hall
+                height 100%
 
+            .yahei
+                font-family "Microsoft YaHei" !important
+
+            .slider.fullscreen
+                z-index -1
+                position fixed
+            .card_pile
+                position: fixed
+                bottom -5%
 block content
     main
-        a.waves-effect.waves-light.btn.modal-trigger.yahei(href="#upload") 上传
+        div.carousel.card_pile
+            a.carousel-item(href="#!")
+                img(src="/static/img/uno/411.png")
+            a.carousel-item(href="#!")
+                img(src="/static/img/uno/110.png")
+            a.carousel-item(href="#!")
+                img(src="/static/img/uno/103.png")
+            a.carousel-item(href="#!")
+                img(src="/static/img/uno/103.png")
+        div.slider.fullscreen
+            ul.slides
+                each s in slides
+                    li
+                        img(src=s.img)
+
+    script.
+        (function () {
+            $('.slider').slider({full_width: true, interval: 3000, indicators: false})
+            $('.carousel').carousel({
+                shift:10,
+                dist:-30
+            });
+        })()
 
